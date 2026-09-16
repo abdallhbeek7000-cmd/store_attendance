@@ -1,0 +1,47 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. جلب كود المشروع من GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. إعداد بيئة لغة Java
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 3. إعداد بيئة Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+
+      # 4. تنزيل الحزم والمكتبات
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. بناء تطبيق الـ APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 6. رفع ملف الـ APK الجاهز للتحميل
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Store-Attendance-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
